@@ -1,0 +1,83 @@
+'  This is update after Lawrence has make change.
+'  Name: VMMFGWIN_OnNewMAT.vms
+'  Where used: Visual Manufacturing window, material entry
+'  Requirements: File needs to be named VMMFGWIN_OnNewMAT.vms
+'  This macro assists the user in filling out information in the "Material Edit Form".
+'  The macro invoked only when the user is adding a new material
+'  It prompts the user for the required information (presents the user with some default values) and then populates the form with the values entered
+'  The default value for Usage Unit of Measure is read from Stock UM field in the Part Table
+'  Created by: Jeff Bell, Feb 2011
+
+
+'	Prompt the user for the Part ID
+
+Part_IdInp=InputBox("Enter Part ID", "Part ID")
+
+'	Check if the user hits the cancel button or enters null, if not proceed
+
+if Part_IdInp <> "" then
+
+'	Set database, filesystem and shell objects
+
+Set objDB = CreateObject("ADODB.Connection")
+Set fs = CreateObject("Scripting.FileSystemObject")
+set objshell = CreateObject("Wscript.Shell")
+
+if  fs.FileExists("C:\visual\vmfgcfg\unpw.vis") then
+
+Set unpw = fs.OpenTextFile("C:\visual\vmfgcfg\unpw.vis", 1)
+ln1=unpw.readline
+ln2=unpw.readline
+unpw.close
+
+else
+
+msgbox("A necessary file was not found" & chr(10) &"Please contact administrator")
+
+end if
+
+'	Open the database
+
+objDB.Open "VMFG_DATA",ln1,ln2
+
+'	Query the database to read the stock unit of measure from the Visual Part table
+ 
+Set UMQry = objDB.execute ("SELECT PART.ID, PART.STOCK_UM FROM PART WHERE ID = '"&Part_IdInp&"'")
+
+'	Check if it returns a value, if yes proceed
+
+if not UMQry.eof then
+
+'	Assign the input part id to Part_ID field
+Part_ID=Part_IdInp
+
+'	Read the Stock_UM from the query result and assign it as default value in the input box
+
+Usage_UM_Default=UMQry.Fields.Item("STOCK_UM")
+Usage_UM=InputBox("Enter Usage_UM", "Usage_UM", Usage_UM_Default)
+
+'	Prompt for QTY_PER, SCRAP_PERCENT, DIM_EXPRESSION
+
+QTY_PER=InputBox("Enter Qty Per", "Qty Per", "1")
+SCRAP_PERCENT=InputBox("Enter Scrap%", "Scrap Percent", "0")
+DIM_EXPRESSION=InputBox("Enter Dimensions", "Dimensions")
+
+'	Send keys to save the material entry
+
+objshell.sendkeys "+{F12}"
+
+'	If the query returns nothing (means Part ID not found) then alert the user and quit macro
+
+else
+					
+MACRO_MESSAGE="Part ID "& Part_IdInp &" not found. Check the value entered"
+MACRO_SUCCESS = FALSE
+					
+end if 
+					
+'	Close the database connection
+
+objDB.close
+ 
+else
+end if
