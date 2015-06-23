@@ -7,7 +7,7 @@
 '  It prompts the user for the required information (presents the user with some default values) and then populates the form with the values entered
 '  The default value for Usage Unit of Measure is read from Stock UM field in the Part Table
 '  Created by: Jeff Bell, Feb 2011
-
+'  This is update after Lawrence has make change. 06/23/2015 11:00
 
 '	Prompt the user for the Part ID
 
@@ -18,6 +18,10 @@ Part_IdInp=InputBox("Enter Part ID", "Part ID")
 if Part_IdInp <> "" then
 
 '	Set database, filesystem and shell objects
+
+'  This is update after Lawrence has make change. 06/23/2015 11:00
+'  This is update after Lawrence has make change. 06/23/2015 11:00
+'  This is update after Lawrence has make change. 06/23/2015 11:00
 
 Set objDB = CreateObject("ADODB.Connection")
 Set fs = CreateObject("Scripting.FileSystemObject")
